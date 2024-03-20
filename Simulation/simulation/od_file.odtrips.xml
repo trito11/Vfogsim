@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-03-16 18:32:16 by Eclipse SUMO od2trips Version 1.19.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/od2tripsConfiguration.xsd">
+
+    <input>
+        <taz-files value="taz_file.taz.xml"/>
+        <od-matrix-files value="OD_file.od"/>
+    </input>
+
+    <output>
+        <output-file value="od_file.odtrips.xml"/>
+    </output>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <trip id="1" depart="7.58" from="-74307847" to="-80715855#1" fromTaz="11" toTaz="12" departLane="free" departSpeed="max"/>
+    <trip id="4" depart="15.39" from="77615982" to="30259989#2" fromTaz="3" toTaz="4" departLane="free" departSpeed="max"/>
+    <trip id="6" depart="26.31" from="15103559#0" to="193139541" fromTaz="7" toTaz="8" departLane="free" departSpeed="max"/>
+    <trip id="3" depart="28.80" from="-122949524#3" to="36729014#0" fromTaz="15" toTaz="16" departLane="free" departSpeed="max"/>
+    <trip id="7" depart="33.45" from="62212085" to="62212735" fromTaz="9" toTaz="10" departLane="free" departSpeed="max"/>
+    <trip id="2" depart="33.79" from="37265518#1" to="-62383931" fromTaz="13" toTaz="14" departLane="free" departSpeed="max"/>
+    <trip id="0" depart="35.35" from="45150439#0" to="30529424" fromTaz="1" toTaz="2" departLane="free" departSpeed="max"/>
+    <trip id="5" depart="47.86" from="211958287#0" to="81527191#3" fromTaz="5" toTaz="6" departLane="free" departSpeed="max"/>
+</routes>
