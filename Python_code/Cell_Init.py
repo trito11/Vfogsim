@@ -1,4 +1,4 @@
-def cell_init(CellMatrix, UserMatrix, CellID_loc, IsBlocked_loc, USERCOUNT, Demand_Resource_loc):
+def Cell_Init(CellMatrix, UserMatrix, CellID_loc, IsBlocked_loc, USERCOUNT, Demand_Resource_loc):
     # Assuming all the vehicles are always connected at to a base station
     UserMatrix[:, IsBlocked_loc] = 0
     for user in range(USERCOUNT):
