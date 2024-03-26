@@ -1,11 +1,11 @@
 import pandas as pd
 import os
+from pathlib import Path
+import pandas as pd
+link=Path(os.path.abspath(__file__))
+link=link.parent.parent
 
 def preprocess(file_addr, source):
-    os.chdir('..')
-    os.chdir('Data')
-    os.chdir(source)
-    traffic = pd.read_csv(file_addr).values
-    os.chdir('../..')  # Trở lại thư mục gốc
-    os.chdir('Functions')  # Đổi lại thư mục Functions
+    data_path = f'{link}/Data/{source}/{file_addr}'
+    traffic = pd.read_csv(data_path).values
     return traffic

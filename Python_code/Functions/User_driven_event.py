@@ -1,6 +1,6 @@
 import numpy as np
 
-def user_driven_event(N_user, N_appType, T_totalSim, flag, Event):
+def User_driven_event(N_user, N_appType, T_totalSim, flag, Event):
     ui_taskType = np.random.randint(N_appType, size=N_user) + 1
     appData = [[0.5e3, 250, .15], [1.0e3, 2500, .20], [1.5e3, 10000, .25]]
     N_cell = 1

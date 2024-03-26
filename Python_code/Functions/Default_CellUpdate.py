@@ -4,7 +4,7 @@ MULTI-TENANCY: OFF
 DETAILS: UPDATES THE CELL PARAMETERS IN CASE: (1) USER MOVED TO ANOTHER
 CELL, (2) THE TASK EXECUTION IS FINISHED
 """""
-def Default_Cell_Update(CellMatrix, UserMatrix_Old, UserMatrix_New, CellID_loc, UserDemand_Location, Is_Blocked, IsCompleted, RemTime_loc, Cell_Change_loc):
+def Default_CellUpdate(CellMatrix, UserMatrix_Old, UserMatrix_New, CellID_loc, UserDemand_Location, Is_Blocked, IsCompleted, RemTime_loc, Cell_Change_loc):
     for user in range(UserMatrix_Old.shape[0]):
         # If the user moved to another cell
         UserMatrix_New[user, Cell_Change_loc] = UserMatrix_Old[user, Cell_Change_loc]

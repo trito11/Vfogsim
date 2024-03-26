@@ -1,4 +1,4 @@
-def td_td(inp, r1, r2):
+def Td_Td(inp, r1, r2):
     # Converting 3D function to 2D.
     # Input: inp[r1][1][r2] --> TD[r1][r2]
     TD = [[0]*r2 for _ in range(r1)]

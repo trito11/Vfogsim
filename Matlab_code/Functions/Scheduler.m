@@ -1,6 +1,8 @@
 function [UserMatrix, CellMatrix] = Scheduler(UserMatrix, CellMatrix, CellID, price_list, CellID_loc, Spectral_Resource_loc, GAMMA, Resource_Demand_loc, Is_Block_loc, Remaining_Time_loc, Demand_ServiceType_loc, bus, app_type, ServiceRequirements, ServiceUtilities, W, B_pow)  
 %% Preparing the user list of the cell
+
     count =1;
+    print(CellMatrix)
     upper_speed = 50;
     for user = 1: size(UserMatrix,1)
         if (UserMatrix(user, CellID_loc) == CellID)

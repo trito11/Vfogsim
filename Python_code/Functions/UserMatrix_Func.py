@@ -1,6 +1,6 @@
 import numpy as np
 
-def user_matrix_func(USERCOUNT, Simulation_Duration, traffic, SINR_loc, Cell_ID_loc, X_loc, Y_loc, Speed_loc, Num_Col):
+def UserMatrix_Func(USERCOUNT, Simulation_Duration, traffic, SINR_loc, Cell_ID_loc, X_loc, Y_loc, Speed_loc, Num_Col):
     # Simulation_Duration = traffic[-1, 0]
     # USERCOUNT = np.max(traffic[:, 1])
     UserMatrix = np.zeros((USERCOUNT, Num_Col, Simulation_Duration))
