@@ -1,5 +1,5 @@
 import numpy as np
-import TD_TD
+from Functions import TD_TD
 
 def QoS_Cell_based(Cell_ID_loc, Ttr, Tmig, Texec, Cell_Change_loc, Demand_Time_loc, Queue_Delay_loc, UserMatrix):
     dummy = TD_TD(UserMatrix[:, Cell_ID_loc, :], UserMatrix.shape[0], UserMatrix.shape[2])

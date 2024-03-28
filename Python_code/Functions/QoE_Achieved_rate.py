@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import cumfreq
-import TD_TD
+from Functions import TD_TD
 
 def QoE_Achieved_rate(rk, xk, req, Ut, UserMatrix):
     Rk = TD_TD(rk * xk, xk.shape[0], xk.shape[2])

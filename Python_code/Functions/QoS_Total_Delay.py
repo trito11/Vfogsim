@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import TD_TD
+from Functions import TD_TD
 
 def QoS_Total_Delay(Ttr, Tmig, Texec, Cell_Change_loc, Demand_Time_loc, Queue_Delay_loc, UserMatrix):
     # T queueing
