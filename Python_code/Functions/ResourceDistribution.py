@@ -1,5 +1,7 @@
 import numpy as np
-import TD_TD
+import os
+print(os.getcwd())
+from Functions import TD_TD
 
 def ResourceDistribution(UserMatrix, events, IsBlocked_loc):
     Total_Requests = np.zeros(4)

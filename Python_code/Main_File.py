@@ -19,17 +19,28 @@ from Default_CellUpdate import Default_CellUpdate
 source = "100"  # Dataset
 EventRate = 0.8  # Less is more! varies between 0.5 =>1.1
 servicediff = 0
-traffic = preprocess("Input.csv", source)
-traffic = np.array(traffic)
-traffic = np.delete(traffic, 0, 1)
-traffic = np.delete(traffic, 0, 0)
-traffic[:, 1] += 1
 
+# Preprocess the traffic data
+traffic = preprocess("Input.csv", source)
+
+# Remove the first column and first row
+traffic = np.delete(traffic, 0, axis=1)
+traffic = np.delete(traffic, 0, axis=0)
+
+# Add 1 to the second column
+traffic[:, 1] = traffic[:, 1] + 1
+
+# Preprocess the bus data
 bus = preprocess("bus.csv", source)
-bus = np.array(bus)
-bus = np.delete(bus, 0, 1)
-bus = np.delete(bus, [3, 4, 5, 6], 1)
-bus[:, :2] += 1
+
+# Remove the first column
+bus = np.delete(bus, 0, axis=1)
+
+# Remove columns 3 to 7
+bus = np.delete(bus, slice(2, 7), axis=1)
+
+# Add 1 to the first two columns
+bus[:, 0:2] = bus[:, 0:2] + 1
 
 # Duration of simulation & users -- upperbounds
 TimeFilter = 200
@@ -79,6 +90,7 @@ UserMatrix = UserMatrix_Func(USERCOUNT, Simulation_Duration, traffic, SINR_loc, 
 
 ServiceRequirements = np.array([APP0_R, APP1_R, APP2_R, APP3_R])
 ServiceUtilities = np.array([APP0_U, APP1_U, APP2_U, APP3_U])
+<<<<<<< HEAD
 
 # THE EVENT GENERATION ~ PER TTI
 events = np.zeros((1, 4))
@@ -102,8 +114,12 @@ for i in range(events.shape[0]):
 
 UserMatrix[:, Rem_Time_loc-1, 0] = UserMatrix[:, Demand_Time_loc-1, 0]
 # print(UserMatrix[0,:,0])
+=======
+>>>>>>> 8472d0e89b72baa8a3d783f4de16dff6e72f96fc
 Unserved = np.zeros(USERCOUNT)
+events = np.zeros((1, 4))
 
+<<<<<<< HEAD
 # SIMULATOR
 for n in range(1, Simulation_Duration + 1):
     a=time.time()
@@ -129,3 +145,75 @@ for n in range(1, Simulation_Duration + 1):
             else:
                 UserMatrix[:, Rem_Time_loc-1, n] = UserMatrix[:, Demand_Time_loc-1, n]
     print(time.time()-a,n)
+=======
+def main():
+    # Your code here
+    # THE EVENT GENERATION ~ PER TTI
+    global events
+    for n in range(1, Simulation_Duration + 1):
+        port = UserMatrix[:, Cell_ID_loc-1, n-1] > 0
+        
+        dummy = Ozgur_User_driven_event(np.sum(port, 0), 3, 1, 1, EventRate, UserMatrix[:, Cell_ID_loc-1, n-1] > 0)
+        dummy = np.transpose(dummy)
+        dummy = dummy[~np.any(dummy == 0, axis=1)]
+        dummy[:, 0] = n
+        events = np.vstack((events, dummy))
+    events = np.delete(events, 0, 0)
+
+    for i in range(events.shape[0]):
+        time_slot = int(events[i, 0])
+        user = int(events[i, 1])
+        app_type = events[i, 2]
+        demand = events[i, 3]
+        UserMatrix[user-1, Demand_ServiceType_loc-1, time_slot-1] = app_type
+        UserMatrix[user-1, Demand_Time_loc-1, time_slot-1] = 1
+        UserMatrix[user-1, Demand_Resource_loc-1, time_slot-1] = demand
+
+    UserMatrix[:, Rem_Time_loc-1, 0] = UserMatrix[:, Demand_Time_loc-1, 0]
+    # print(UserMatrix[0,:,0])
+    
+    # SIMULATOR
+    for n in range(1, Simulation_Duration + 1):
+        for c in range(1, CELLCOUNT + 1):
+            UserMatrix[:, :, n-1], CellMatrix[c - 1, :, n - 1] = Scheduler(UserMatrix[:, :, n-1], CellMatrix[c - 1, :, n - 1], c, price_list, Cell_ID_loc-1, SpectralResources_loc-1, GAMMA, Demand_Resource_loc-1, IsBlocked_loc-1, Rem_Time_loc-1, Demand_ServiceType_loc-1, bus[(bus[:, 0] == n) & (bus[:, 4] == c), :], Demand_ServiceType_loc-1, ServiceRequirements, ServiceUtilities, W, B_pow)
+        if n > 1:
+            CellMatrix[:, :, n - 1], UserMatrix[:, :, n-1] = Default_CellUpdate(CellMatrix[:, :, n - 2], UserMatrix[:, :, n - 2], UserMatrix[:, :, n-1], Cell_ID_loc-1, Demand_Resource_loc-1, IsBlocked_loc-1, Completed_loc-1, Rem_Time_loc-1, Cell_Change_loc-1)
+        for user in range(1, USERCOUNT + 1):
+            if n > 1:
+                UserMatrix[user - 1, Queue_Delay_loc-1, n-1] = UserMatrix[user - 1, Queue_Delay_loc-1, n - 2]
+            if UserMatrix[user - 1, Rem_Time_loc-1, n-1] > 0 and UserMatrix[user - 1, IsBlocked_loc-1, n-1] == 1 and UserMatrix[user - 1, SINR_loc-1, n-1] > 0:
+                UserMatrix[user - 1, Queue_Delay_loc-1, n-1] += 1
+            if n < Simulation_Duration:
+                if UserMatrix[user - 1, Demand_Time_loc-1, n ] > 0 and UserMatrix[user - 1, Rem_Time_loc-1, n-1] > 0:
+                    if n > 1:
+                        Unserved[user - 1] += 1
+                    UserMatrix[:, Rem_Time_loc-1, n ] = UserMatrix[:, Demand_Time_loc-1, n ]
+                elif UserMatrix[user-1, Demand_Time_loc-1, n ] == 0 and UserMatrix[user-1, Rem_Time_loc-1, n-1] >= 0:
+                    UserMatrix[:, Rem_Time_loc-1, n ] = UserMatrix[:, Rem_Time_loc-1, n-1]
+                else:
+                    UserMatrix[:, Rem_Time_loc-1, n] = UserMatrix[:, Demand_Time_loc-1, n]
+        
+    # SIMULATOR
+    for n in range(1, Simulation_Duration + 1):
+        for c in range(1, CELLCOUNT + 1):
+            UserMatrix[:, :, n-1], CellMatrix[c - 1, :, n - 1] = Scheduler(UserMatrix[:, :, n-1], CellMatrix[c - 1, :, n - 1], c, price_list, Cell_ID_loc-1, SpectralResources_loc-1, GAMMA, Demand_Resource_loc-1, IsBlocked_loc-1, Rem_Time_loc-1, Demand_ServiceType_loc-1, bus[(bus[:, 0] == n) & (bus[:, 4] == c), :], Demand_ServiceType_loc-1, ServiceRequirements, ServiceUtilities, W, B_pow)
+        if n > 1:
+            CellMatrix[:, :, n - 1], UserMatrix[:, :, n-1] = Default_CellUpdate(CellMatrix[:, :, n - 2], UserMatrix[:, :, n - 2], UserMatrix[:, :, n-1], Cell_ID_loc-1, Demand_Resource_loc-1, IsBlocked_loc-1, Completed_loc-1, Rem_Time_loc-1, Cell_Change_loc-1)
+        for user in range(1, USERCOUNT + 1):
+            if n > 1:
+                UserMatrix[user - 1, Queue_Delay_loc-1, n-1] = UserMatrix[user - 1, Queue_Delay_loc-1, n - 2]
+            if UserMatrix[user - 1, Rem_Time_loc-1, n-1] > 0 and UserMatrix[user - 1, IsBlocked_loc-1, n-1] == 1 and UserMatrix[user - 1, SINR_loc-1, n-1] > 0:
+                UserMatrix[user - 1, Queue_Delay_loc-1, n-1] += 1
+            if n < Simulation_Duration:
+                if UserMatrix[user - 1, Demand_Time_loc-1, n ] > 0 and UserMatrix[user - 1, Rem_Time_loc-1, n-1] > 0:
+                    if n > 1:
+                        Unserved[user - 1] += 1
+                    UserMatrix[:, Rem_Time_loc-1, n ] = UserMatrix[:, Demand_Time_loc-1, n ]
+                elif UserMatrix[user-1, Demand_Time_loc-1, n ] == 0 and UserMatrix[user-1, Rem_Time_loc-1, n-1] >= 0:
+                    UserMatrix[:, Rem_Time_loc-1, n ] = UserMatrix[:, Rem_Time_loc-1, n-1]
+                else:
+                    UserMatrix[:, Rem_Time_loc-1, n] = UserMatrix[:, Demand_Time_loc-1, n]
+
+if __name__ == "__main__":
+    main()
+>>>>>>> 8472d0e89b72baa8a3d783f4de16dff6e72f96fc
