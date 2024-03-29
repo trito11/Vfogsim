@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import sys
 import os
+import time
 from pathlib import Path
 link=Path(os.path.abspath(__file__))
 link=link.parent
@@ -83,7 +84,6 @@ ServiceUtilities = np.array([APP0_U, APP1_U, APP2_U, APP3_U])
 events = np.zeros((1, 4))
 for n in range(1, Simulation_Duration + 1):
     port = UserMatrix[:, Cell_ID_loc-1, n-1] > 0
-    
     dummy = Ozgur_User_driven_event(np.sum(port, 0), 3, 1, 1, EventRate, UserMatrix[:, Cell_ID_loc-1, n-1] > 0)
     dummy = np.transpose(dummy)
     dummy = dummy[~np.any(dummy == 0, axis=1)]
@@ -106,21 +106,26 @@ Unserved = np.zeros(USERCOUNT)
 
 # SIMULATOR
 for n in range(1, Simulation_Duration + 1):
+    a=time.time()
     for c in range(1, CELLCOUNT + 1):
         UserMatrix[:, :, n-1], CellMatrix[c - 1, :, n - 1] = Scheduler(UserMatrix[:, :, n-1], CellMatrix[c - 1, :, n - 1], c, price_list, Cell_ID_loc-1, SpectralResources_loc-1, GAMMA, Demand_Resource_loc-1, IsBlocked_loc-1, Rem_Time_loc-1, Demand_ServiceType_loc-1, bus[(bus[:, 0] == n) & (bus[:, 4] == c), :], Demand_ServiceType_loc-1, ServiceRequirements, ServiceUtilities, W, B_pow)
     if n > 1:
         CellMatrix[:, :, n - 1], UserMatrix[:, :, n-1] = Default_CellUpdate(CellMatrix[:, :, n - 2], UserMatrix[:, :, n - 2], UserMatrix[:, :, n-1], Cell_ID_loc-1, Demand_Resource_loc-1, IsBlocked_loc-1, Completed_loc-1, Rem_Time_loc-1, Cell_Change_loc-1)
+    print(time.time()-a)
     for user in range(1, USERCOUNT + 1):
+        x= UserMatrix[user - 1, Demand_Time_loc-1, n ]
+        y= UserMatrix[user - 1, Rem_Time_loc-1, n-1]
         if n > 1:
             UserMatrix[user - 1, Queue_Delay_loc-1, n-1] = UserMatrix[user - 1, Queue_Delay_loc-1, n - 2]
-        if UserMatrix[user - 1, Rem_Time_loc-1, n-1] > 0 and UserMatrix[user - 1, IsBlocked_loc-1, n-1] == 1 and UserMatrix[user - 1, SINR_loc-1, n-1] > 0:
+        if y > 0 and UserMatrix[user - 1, IsBlocked_loc-1, n-1] == 1 and UserMatrix[user - 1, SINR_loc-1, n-1] > 0:
             UserMatrix[user - 1, Queue_Delay_loc-1, n-1] += 1
         if n < Simulation_Duration:
-            if UserMatrix[user - 1, Demand_Time_loc-1, n ] > 0 and UserMatrix[user - 1, Rem_Time_loc-1, n-1] > 0:
+            if x > 0 and y > 0:
                 if n > 1:
                     Unserved[user - 1] += 1
                 UserMatrix[:, Rem_Time_loc-1, n ] = UserMatrix[:, Demand_Time_loc-1, n ]
-            elif UserMatrix[user-1, Demand_Time_loc-1, n ] == 0 and UserMatrix[user-1, Rem_Time_loc-1, n-1] >= 0:
+            elif x == 0 and y >= 0:
                 UserMatrix[:, Rem_Time_loc-1, n ] = UserMatrix[:, Rem_Time_loc-1, n-1]
             else:
                 UserMatrix[:, Rem_Time_loc-1, n] = UserMatrix[:, Demand_Time_loc-1, n]
+    print(time.time()-a,n)
