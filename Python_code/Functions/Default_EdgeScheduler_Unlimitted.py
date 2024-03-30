@@ -5,6 +5,7 @@ import numpy as np
 % THEIR TASKS. THE KEY ASSUMPTION IS THE NECESSARY MACHINES ARE ACTIVE. THE
 % BASE STATION HAS UNLIMITTED EDGE RESOURCES SO THERE IS NO UPPER LIMIT OR
 % OPTIMIZATION PROBLEM"""
+
 def Default_EdgeScheduler_Unlimitted(UserList):
     Resource_Demand_loc = UserList.shape[1] - 4
     Is_Block_loc = UserList.shape[1] - 1

@@ -12,6 +12,10 @@ from reg3 import reg3
 from reg3_right import reg3_right
 from reg4 import reg4
 from reg4_right import reg4_right
+from memory_profiler import profile
+import gc
+
+
 def Default_Scheduler(user_list, upper_speed, R1, R2, R3, U1, U2, U3, window_size):
     USERCOUNT = user_list.shape[0]
     Hmax = 1000
@@ -79,9 +83,6 @@ def Default_Scheduler(user_list, upper_speed, R1, R2, R3, U1, U2, U3, window_siz
     a=None
 
     # Sử dụng hàm intlinprog_gurobi đã xây dựng ở trên
-    xsol, fval, exitflag, time = intlinprog_gurobi(c, intcon, B, b, A, a, lb, ub)
-    
-
+    xsol= intlinprog_gurobi(c, intcon, B, b, A, a, lb, ub)
     res = xsol[:USERCOUNT]
-    
     return res

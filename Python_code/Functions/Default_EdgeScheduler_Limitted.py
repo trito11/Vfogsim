@@ -4,6 +4,11 @@ from Default_UtilityFunction_Edge import *
 import pulp
 # import intlinprog_pulp
 from intlinprog_gurobi import intlinprog_gurobi
+from memory_profiler import profile
+import gc
+
+
+# @profile
 def Default_EdgeScheduler_Limitted(B_pow, R3, R2, GAMMA, UserList_All, CellMatrix, price_list, Spectral_Resource_loc, Resource_Demand_loc, Is_Block_loc, Remaining_Time_loc, Demand_ServiceType_loc, bus):
     counter = 0
     UserList = []
@@ -51,12 +56,14 @@ def Default_EdgeScheduler_Limitted(B_pow, R3, R2, GAMMA, UserList_All, CellMatri
     intcon = list(range(1, USERCOUNT + 1))
 
     # Giải bài toán tối ưu hóa bằng PuLP
-    xsol, fval, exitflag,time = intlinprog_gurobi(c, intcon, B, b, A, a, lb, ub)
+    xsol  = intlinprog_gurobi(c, intcon, B, b, A, a, lb, ub)
+    
 
     # Cập nhật UserList_All dựa trên kết quả
     res = xsol[:USERCOUNT]
     for user in range(USERCOUNT):
         if res[user] == 1:
             UserList_All[user_info[user]][Is_Block_loc] = 0
+    gc.collect()
 
     return UserList_All

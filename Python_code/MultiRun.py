@@ -2,17 +2,17 @@ import numpy as np
 import os
 import scipy.io as sio
 from Functions import Acceptance_ratio, ResourceDistribution, QoS_Cell_based, QoS_Total_Delay, QoE_Achieved_rate, plotting_general
-from Main_File import GAMMA, USERCOUNT, SINR_loc, SpectralResources_loc, UserMatrix, Unserved, events, IsBlocked_loc, Cell_ID_loc, Ttr, Tmig, Texec, Cell_Change_loc, Demand_Time_loc, Queue_Delay_loc, ServiceRequirements, ServiceUtilities
-import Main_File
-
+# from Main_File import  USERCOUNT, SINR_loc, SpectralResources_loc, UserMatrix, Unserved, events, IsBlocked_loc, Cell_ID_loc, Ttr, Tmig, Texec, Cell_Change_loc, Demand_Time_loc, Queue_Delay_loc, ServiceRequirements, ServiceUtilities
+from Main_File import *
+GAMMA = 0.000001
 UPBOUND = 10
 print(f"Will be run for {UPBOUND} instances")
 
 for mircolo in range(1, UPBOUND + 1):
     print(f"Step {mircolo} in progress")
-    Main_File.main()
+    main()
     filename = f"{mircolo}.mat"
-    os.chdir('Results')
+    os.chdir('D:\Lab\Vfogsim\Python_code\Results')
     sio.savemat(filename, {'var': mircolo})  # replace 'var' with your actual variables
     os.chdir('..')
 

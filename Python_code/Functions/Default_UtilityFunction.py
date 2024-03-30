@@ -1,3 +1,4 @@
+
 def Default_UtilityFunction(USERCOUNT, user_list, OBJSIZE):
     const = [[0] * OBJSIZE for _ in range(USERCOUNT)]
     

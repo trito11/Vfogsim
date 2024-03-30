@@ -1,7 +1,10 @@
 import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
+from memory_profiler import profile
+import gc
 
+# @profile
 def intlinprog_gurobi(f, intcon, A, b, Aeq=None, beq=None, lb=None, ub=None):
     # Xác định số lượng biến
     if A is not None:
@@ -50,11 +53,12 @@ def intlinprog_gurobi(f, intcon, A, b, Aeq=None, beq=None, lb=None, ub=None):
     model.optimize()
     if model.status == GRB.OPTIMAL:
         x_opt = [x[i].X for i in range(n)]
-        fval = model.ObjVal
-        exitflag = model.Status
-        time = model.Runtime
+        
     else:
         print('No solution')
 
+    model.dispose()
+    del model
+    gc.collect()
     # Trích xuất kết quả tối ưu hóa
-    return x_opt, fval, exitflag, time
+    return x_opt

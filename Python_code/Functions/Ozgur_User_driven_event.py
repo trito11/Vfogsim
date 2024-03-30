@@ -8,19 +8,15 @@ def Ozgur_User_driven_event(N_user, N_appType, T_totalSim, flag, Event, port):
     ui_taskType = np.random.randint(1, N_appType + 1, size=N_user)
 
     # Định nghĩa dữ liệu ứng dụng cho mỗi loại ứng dụng
-    appData = {}
-    appData[1] = [0.5e3, 250, 0.15]  # Light
-    appData[2] = [1.0e3, 2500, 0.20]  # Medium
-    appData[3] = [1.5e3, 10000, 0.25]  # Heavy
-
+    appData = np.zeros((3, 3))
+    appData[0] = [0.5e3, 250, 0.15]  # Light
+    appData[1] = [1.0e3, 2500, 0.20]  # Medium
+    appData[2] = [1.5e3, 10000, 0.25]  # Heavy
     N_cell = 1
     Epoch = 0.5
     Lambda = N_user / N_cell / Epoch
     t = -np.log(np.random.rand()) / Lambda
     n = -1
-    
-    et = []
-
     # Tạo ngẫu nhiên một ma trận arc theo phân phối Poisson
     arc = np.random.poisson(N_user, size=N_user)
     arc = arc / np.max(arc)
@@ -38,10 +34,10 @@ def Ozgur_User_driven_event(N_user, N_appType, T_totalSim, flag, Event, port):
             if arc[n] > 0:
                 ui[n] = k+1  # userId
                 if flag == 0:
-                    tt[n] = ui_taskType[int(ui[n])]  # single taskType
+                    tt[n] = ui_taskType[int(ui[n])-1]  # single taskType
                 else:
                     tt[n] = np.random.randint(1, N_appType + 1)  # multiple taskType
-                ts[n] = appData[tt[n]][0] + appData[tt[n]][0] * (np.random.rand() * 0.2 - 0.1)  # taskSize
+                ts[n] = appData[int(tt[n]-1)][0] + appData[int(tt[n]-1)][0] * (np.random.rand() * 0.2 - 0.1)  # taskSize
                 et[n] = t
                 t = t - np.log(np.random.rand()) / Lambda
     

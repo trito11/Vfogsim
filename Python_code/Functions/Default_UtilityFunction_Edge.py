@@ -1,4 +1,5 @@
 import math
+
 def Default_UtilityFunction_Edge(UserList, price_list, OBJSIZE, USERCOUNT, Resource_Demand_loc, Remaining_Time_loc, Demand_ServiceType_loc):
     const = [[0] * OBJSIZE for _ in range(USERCOUNT)]
     
