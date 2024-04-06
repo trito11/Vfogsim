@@ -9,9 +9,9 @@ def Ozgur_User_driven_event(N_user, N_appType, T_totalSim, flag, Event, port):
 
     # Định nghĩa dữ liệu ứng dụng cho mỗi loại ứng dụng
     appData = np.zeros((3, 3))
-    appData[0] = [0.5e3, 250, 0.15]  # Light
-    appData[1] = [1.0e3, 2500, 0.20]  # Medium
-    appData[2] = [1.5e3, 10000, 0.25]  # Heavy
+    appData[0] = [2000, 250, 0.15]  # Light
+    appData[1] = [2250, 2500, 0.20]  # Medium
+    appData[2] = [2500, 10000, 0.25]  # Heavy
     N_cell = 1
     Epoch = 0.5
     Lambda = N_user / N_cell / Epoch
@@ -32,7 +32,7 @@ def Ozgur_User_driven_event(N_user, N_appType, T_totalSim, flag, Event, port):
         if port[k] > 0:
             n = n + 1
             if arc[n] > 0:
-                ui[n] = k+1  # userId
+                ui[n] = k  # userId
                 if flag == 0:
                     tt[n] = ui_taskType[int(ui[n])-1]  # single taskType
                 else:

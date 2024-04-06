@@ -40,19 +40,21 @@ def Default_EdgeScheduler_Limitted(B_pow, R3, R2, GAMMA, UserList_All, CellMatri
 
     # Tổng tài nguyên được gán không vượt quá tài nguyên có sẵn
     Tot_AssignedResources = [UserList[i][Resource_Demand_loc] for i in range(USERCOUNT)] + [0] * (USERCOUNT)
-    Val_AssignedResources = CellMatrix[0][1] + len(bus) * B_pow
+    Val_AssignedResources = CellMatrix[1] + len(bus) * B_pow
     if Val_AssignedResources > 0:
         print(B_pow)
 
     # Xây dựng các ma trận ràng buộc
-    B = [Tot_AssignedResources, UtilityPerUser]
-    b = [Val_AssignedResources, Val_UtilityFunction]
-    A = []
-    a = []
+    B = [Tot_AssignedResources]+ UtilityPerUser
+    B=np.array(B)
+    b = [Val_AssignedResources]+Val_UtilityFunction
+    b=np.array(b)
+    A = None
+    a = None
 
     # Giới hạn dưới và giới hạn trên cho các biến quyết định
     lb = [0] * (2 * USERCOUNT)
-    ub = [1] * USERCOUNT + [pulp.LpInfinity] * USERCOUNT
+    ub = [1] * USERCOUNT + [np.inf] * USERCOUNT
     intcon = list(range(1, USERCOUNT + 1))
 
     # Giải bài toán tối ưu hóa bằng PuLP

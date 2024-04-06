@@ -33,11 +33,11 @@ def main():
     bus = preprocess("bus.csv", source)
     bus = np.array(bus)
     bus = np.delete(bus, 0, 1)
-    bus = np.delete(bus, [3, 4, 5, 6], 1)
+    bus = np.delete(bus, [2,3, 4, 5, 6], 1)
     bus[:, :2] += 1
 
     # Duration of simulation & users -- upperbounds
-    TimeFilter = 1
+    TimeFilter = 200
     UserFilter = 500
     Simulation_Duration = traffic[-1, 0]
     USERCOUNT = max(traffic[:, 1])
@@ -78,6 +78,7 @@ def main():
     USERCOUNT=int(USERCOUNT)
     CellMatrix = np.zeros((CELLCOUNT, 3, Simulation_Duration),dtype=float)
     B_pow = 5000  # if it is 0 - no fog devices on buses
+    
     UserMatrix = UserMatrix_Func(USERCOUNT, Simulation_Duration, traffic, SINR_loc, Cell_ID_loc, X_loc, Y_loc, Speed_loc, 14)
 
     ServiceRequirements = np.array([APP0_R, APP1_R, APP2_R, APP3_R])

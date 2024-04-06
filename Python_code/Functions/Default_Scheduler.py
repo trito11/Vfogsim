@@ -16,6 +16,7 @@ from memory_profiler import profile
 import gc
 
 
+
 def Default_Scheduler(user_list, upper_speed, R1, R2, R3, U1, U2, U3, window_size):
     USERCOUNT = user_list.shape[0]
     Hmax = 1000

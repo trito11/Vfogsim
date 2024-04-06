@@ -1,102 +1,60 @@
-import numpy as np
-import gurobipy as gp
-from gurobipy import GRB
+from pyproj import Proj
+from math import radians, cos, sin, asin, sqrt
+def latlon_to_utm_zone(lat, lon):
+    # Xác định zone number và zone letter cho tọa độ latitude và longitude
+    zone_number = int((lon + 180) / 6) + 1
+    zone_letter = 'CDEFGHJKLMNPQRSTUVWXX'[int((lat + 80) / 8)]
 
-def intlinprog_gurobi(f, intcon, A, b, Aeq=None, beq=None, lb=None, ub=None):
-    # Xác định số lượng biến
-    if A is not None:
-        n = A.shape[1]
-    elif Aeq is not None:
-        n = Aeq.shape[1]
-    else:
-        raise ValueError('No linear constraints specified')
+    # Khởi tạo một đối tượng Proj cho hệ thống toạ độ UTM
+    utm_proj = Proj(proj='utm', zone=zone_number, ellps='WGS84', datum='WGS84', zone_letter=zone_letter)
 
-    # Chuyển đổi ma trận ràng buộc sang định dạng tuplelist
-    A = gp.tuplelist(A) if A is not None else None
-    Aeq = gp.tuplelist(Aeq) if Aeq is not None else None
+    # Chuyển đổi tọa độ latitude và longitude sang UTM
+    easting, northing = utm_proj(lon, lat)
 
-    # Tạo mô hình Gurobi
-    model = gp.Model()
+    return zone_number, zone_letter
 
-    # Thiết lập loại biến
-    vtype = ['C'] * n
-    for i in intcon:
-        vtype[i] = 'I'
+# Tọa độ latitude và longitude của điểm cụ thể
+lat, lon = 60.17, 24.9323
 
-    # Thêm biến vào mô hình
-    x = model.addVars(n, vtype=vtype,name="x")
-    # Thiết lập hàm mục tiêu
-    model.setObjective(gp.quicksum(f[j] * x[j] for j in range(n)), GRB.MINIMIZE)
+# Xác định zone number và zone letter từ tọa độ latitude và longitude
+zone_number, zone_letter = latlon_to_utm_zone(lat, lon)
+print("Zone number:", zone_number)
+print("Zone letter:", zone_letter)
 
-    # Thêm ràng buộc không bằng nhau
-    if A is not None:
-        for i in range(len(A)):
-            model.addConstr(gp.quicksum(A[i][j] * x[j] for j in range(n)) <= b[i])
-
-    # Thêm ràng buộc bằng nhau
-    if Aeq is not None:
-        for i in range(len(Aeq)):
-            model.addConstr(gp.quicksum(Aeq[i][j] * x[j] for j in range(n)) == beq[i])
-
-    # Thiết lập giới hạn dưới và giới hạn trên
-    if lb is not None:
-        model.setAttr('LB', x, lb)
-    if ub is not None:
-        model.setAttr('UB', x, ub)
-
-    # Thiết lập tham số của trình giải
-    model.setParam('OutputFlag', 0)
-    model.setParam('TimeLimit', 1800)
-
-    # Tối ưu hóa mô hình
-    model.optimize()
-
-    # Trích xuất kết quả tối ưu hóa
-    if model.status == GRB.OPTIMAL:
-        print('Optimal solution:')
-        for v in model.getVars():
-            print(f'{v.varName} = {v.x}')
-        print(f'Obj: {model.objVal}')
-    else:
-        print('No solution')
-
+from geopy.distance import geodesic
+from pyproj import Proj, transform
+def haversine(lat1, lon1, lat2, lon2):
+    """
+    Calculate the great circle distance between two points 
+    on the earth (specified in decimal degrees)
+    """
+    # convert decimal degrees to radians 
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    # haversine formula 
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1 
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a)) 
+    # Radius of earth in kilometers is 6371
+    km = 6371 * c
+    # Convert kilometers to meters
     
+    return km
+def utm_to_latlon(easting, northing, zone_number, zone_letter):
+    p1 = Proj(proj='utm', zone=zone_number, ellps='WGS84', datum='WGS84')
+    lon, lat = p1(easting, northing, inverse=True)
+    return lat, lon
 
-def generate_random_data(m, n, n_eq=None, n_intcon=None):
-    # Tạo dữ liệu ngẫu nhiên cho các tham số
-    f = np.random.rand(n)
-    A = np.random.rand(m, n)
-    b = np.random.rand(m)
-    Aeq = None
-    beq = None
-    if n_eq:
-        Aeq = np.random.rand(n_eq, n)
-        beq = np.random.rand(n_eq)
-    lb = np.random.rand(n)
-    ub = np.random.rand(n)
-    intcon = None
-    if n_intcon:
-        intcon = np.random.choice(range(n), n_intcon, replace=False)
-    return f, intcon, A, b, Aeq, beq, lb, ub
+def distance_between_points(lat1, lon1, lat2, lon2):
+    return geodesic((lat1, lon1), (lat2, lon2)).kilometers
 
-# Số lượng biến và ràng buộc
-m = 20  # Số lượng ràng buộc
-n = 15   # Số lượng biến
-n_eq = 2  # Số lượng ràng buộc bằng nhau
-n_intcon = 5  # Số lượng biến nguyên
+# Example coordinates
+utm1 = (386112, 6671780, 35, 'V')
+utm2 = (386112, 6671771, 35, 'V')
 
-# Sinh dữ liệu ngẫu nhiên
-f, intcon, A, b, Aeq, beq, lb, ub = generate_random_data(m, n, n_eq, n_intcon)
-
-# In các tham số đã sinh
-print("f:", f)
-print("intcon:", intcon)
-print("A:", A)
-print("b:", b)
-print("Aeq:", Aeq)
-print("beq:", beq)
-print("lb:", lb)
-print("ub:", ub)
-
-intlinprog_gurobi(f, intcon, A, b, None, None, lb, ub)
-# In ra giá trị của biến tối ưu và giá trị tối ưu của hàm mục tiêu
+# Convert UTM to latitude and longitude
+lat1, lon1 = utm_to_latlon(*utm1)
+lat2, lon2 = utm_to_latlon(*utm2)
+print(lat1, lon1)
+print(lat2, lon2)
+print(haversine(lat1, lon1, lat2, lon2)*1000)

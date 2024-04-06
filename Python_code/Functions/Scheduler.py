@@ -16,7 +16,7 @@ def Scheduler(UserMatrix, CellMatrix, CellID, price_list, CellID_loc, Spectral_R
     UserList = UserMatrix[UserIndices]
     Info_User = UserIndices + 1
 
-    AppTypeIndices = UserList[:, app_type] - 1
+    AppTypeIndices = UserList[:, app_type] 
     AppTypeIndices = AppTypeIndices.astype(int)
 
     R1 = ServiceRequirements[AppTypeIndices, 0]
@@ -28,13 +28,12 @@ def Scheduler(UserMatrix, CellMatrix, CellID, price_list, CellID_loc, Spectral_R
     Window_size = W[AppTypeIndices]
 
     SpectralResources = Default_Scheduler(np.log2(1 + UserList[:, 0] / GAMMA), upper_speed, R1, R2, R3, U1, U2, U3, Window_size)
-    SpectralResources = np.round(SpectralResources * 10000) / 10000
+    SpectralResources = np.around(SpectralResources, decimals=4)
 
     for k in range(Info_User.shape[0]): # Updating the user matrix
        UserMatrix[Info_User[k]-1, Spectral_Resource_loc] = SpectralResources[k]
        UserList[k][Spectral_Resource_loc] = SpectralResources[k]
        UserMatrix[Info_User[k]-1, app_type] = UserList[k][app_type]
-    del SpectralResources
 
     UserList = Default_EdgeScheduler_Limitted(B_pow, R3, R2, GAMMA, UserList, CellMatrix, price_list, Spectral_Resource_loc, Resource_Demand_loc, Is_Block_loc, Remaining_Time_loc, Demand_ServiceType_loc, bus)
 
